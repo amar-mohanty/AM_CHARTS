@@ -109,7 +109,7 @@ const ws = new VelaWorkspace('#chart', {
     //                                 //  the flow slot for contributed actions — naming an
     //                                 //  action's ID instead pins it at that spot. An explicit
     //                                 //  list is the side's complete (and frozen) contract.
-});
+//});
 
 void ws.chart.ready().then(() => console.log('[vela-dev] chart ready'));
 
