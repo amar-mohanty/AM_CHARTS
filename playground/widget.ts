@@ -19,12 +19,37 @@ import { BinanceProvider } from '../src/data/providers/binance';
 import { addSampleMarks } from './marks';
 import { DemoEngine, DEMO_SCRIPTS } from './demo-engine';
 import { playgroundStorage } from './persistence';
+import { DhanProvider, YahooFinanceProvider, AlphaVantageProvider } from '../src/providers/marketProviders';
 
 // The playground's CUSTOM persistence (shared with the workspace page): with `persist`
 // on, the shell saves and restores EVERYTHING through this adapter — prefs, renderer
 // config, and user drawings. The key is pinned so this page never collides with the
 // multi-chart page's own document ('vela-workspace') in the same adapter namespace.
 const storage = playgroundStorage();
+
+// Credentials
+const DHAN_CLIENT_ID = 'YOUR_DHAN_CLIENT_ID';
+const DHAN_API_TOKEN = 'YOUR_DHAN_API_TOKEN';
+const ALPHA_VANTAGE_KEY = 'YOUR_ALPHA_VANTAGE_API_KEY';
+
+const ws = new VelaWorkspace('#chart', {
+    layout: false, // SINGLE-CHART mode
+    symbol: 'yahoo:^NSEI', // Set initial default symbol (e.g. Nifty 50)
+    timeframe: 'D',
+    live: false,
+    theme: 'dark',
+    autofocus: true,
+    persist: 'vela-widget',
+    storage,
+    providers: {
+        binance: () => new BinanceProvider(),
+        dhan: () => new DhanProvider(DHAN_CLIENT_ID, DHAN_API_TOKEN),
+        yahoo: () => new YahooFinanceProvider(),
+        alphavantage: () => new AlphaVantageProvider(ALPHA_VANTAGE_KEY),
+    },
+    engines: { demo: () => new DemoEngine() },
+    defaultLanguage: 'demo',
+});
 
 const ws = new VelaWorkspace('#chart', {
     layout: false, // SINGLE-CHART mode: one cell, no layout picker, no sync switches
