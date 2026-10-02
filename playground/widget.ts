@@ -33,36 +33,36 @@ const DHAN_API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyUmVnaW9uIjo
 const ALPHA_VANTAGE_KEY = '55ZITWU4955XXAGB';
 
 const ws = new VelaWorkspace('#chart', {
-    layout: false, // SINGLE-CHART mode
-    symbol: 'yahoo:^NSEI', // Set initial default symbol (e.g. Nifty 50)
-    timeframe: 'D',
-    live: false,
-    theme: 'dark',
-    autofocus: true,
-    persist: 'vela-widget',
-    storage,
-    providers: {
-        binance: () => new BinanceProvider(),
-        dhan: () => new DhanProvider(DHAN_CLIENT_ID, DHAN_API_TOKEN),
-        yahoo: () => new YahooFinanceProvider(),
-        alphavantage: () => new AlphaVantageProvider(ALPHA_VANTAGE_KEY),
-    },
-    engines: { demo: () => new DemoEngine() },
-    defaultLanguage: 'demo',
+  layout: false, // SINGLE-CHART mode
+  symbol: 'yahoo:^NSEI', // Nifty 50 default
+  timeframe: 'D',
+  live: false,
+  theme: 'dark',
+  autofocus: true,
+  persist: 'vela-widget',
+  storage,
+  providers: {
+    binance: () => new BinanceProvider(),
+    dhan: () => new DhanProvider(DHAN_CLIENT_ID, DHAN_API_TOKEN),
+    yahoo: () => new YahooFinanceProvider(),
+    alphavantage: () => new AlphaVantageProvider(ALPHA_VANTAGE_KEY),
+  },
+  engines: { demo: () => new DemoEngine() },
+  defaultLanguage: 'demo',
 });
 
-const ws = new VelaWorkspace('#chart', {
-    layout: false, // SINGLE-CHART mode: one cell, no layout picker, no sync switches
-    symbol: 'BTCUSDT', // bare = first declared provider (binance); 'coinbase:BTC-USD' pins a venue
-    timeframe: '60',
-    live: true,
-    theme: 'dark',
-    autofocus: true, // the chart IS the page — shortcuts work from the first keystroke
-    persist: 'vela-widget', // → 'vela-play:vela-widget' in devtools (the page's historical key)
-    storage,
-    providers: { binance: () => new BinanceProvider() },
-    engines: { demo: () => new DemoEngine() }, // swap for `pine: () => new PineWorkerEngine()` (see the header)
-    defaultLanguage: 'demo', // scripts added without a `language` run on the engine above
+//const ws = new VelaWorkspace('#chart', {
+//    layout: false, // SINGLE-CHART mode: one cell, no layout picker, no sync switches
+//    symbol: 'BTCUSDT', // bare = first declared provider (binance); 'coinbase:BTC-USD' pins a venue
+//    timeframe: '60',
+//    live: true,
+//    theme: 'dark',
+//    autofocus: true, // the chart IS the page — shortcuts work from the first keystroke
+//    persist: 'vela-widget', // → 'vela-play:vela-widget' in devtools (the page's historical key)
+//    storage,
+//    providers: { binance: () => new BinanceProvider() },
+//    engines: { demo: () => new DemoEngine() }, // swap for `pine: () => new PineWorkerEngine()` (see the header)
+//    defaultLanguage: 'demo', // scripts added without a `language` run on the engine above
     // No script manifest: the indicators dialog lists the built-in catalog only. Scripts
     // reach the chart through the Code panel below (or an `indicators` manifest — see the
     // commented option further down).
