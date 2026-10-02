@@ -6,12 +6,17 @@
 // Vela ships no scripting engine — `demo-engine.ts` is the page's own, written against
 // the public port (see widget.ts's header). For Pine Script:
 // `npm i @luxalgo/vela-pinets pinets` and `engines: { pine: () => new PineWorkerEngine() }`.
+const DHAN_CLIENT_ID = '1110885446';
+const DHAN_API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyUmVnaW9uIjoiUjEiLCJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzkwOTY1MjE0LCJpYXQiOjE3OTA4Nzg4MTQsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEwODg1NDQ2In0.Joduj0E6H90qZR3IVv5TWcPVJ3CySGWVAHVJu6wLcW5XftM1fHaPgnBhOg5vbc3gzh_CAca-OFyOBGK6wznlAA';
+const ALPHA_VANTAGE_KEY = '55ZITWU4955XXAGB';
+
 import type { Vela } from "../src";
 import { VelaWorkspace } from "../src/workspace";
 import { BinanceProvider } from "../src/data/providers/binance";
 import { DemoEngine } from "./demo-engine";
 import { playgroundStorage } from "./persistence";
 import { addSampleMarks } from "./marks";
+import { DhanProvider, YahooFinanceProvider, AlphaVantageProvider } from '../src/providers/marketProviders';
 
 const ws = new VelaWorkspace("#workspace", {
   layout: "4",
