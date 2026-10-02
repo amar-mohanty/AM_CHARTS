@@ -28,9 +28,9 @@ import { DhanProvider, YahooFinanceProvider, AlphaVantageProvider } from '../src
 const storage = playgroundStorage();
 
 // Credentials
-const DHAN_CLIENT_ID = 'YOUR_DHAN_CLIENT_ID';
-const DHAN_API_TOKEN = 'YOUR_DHAN_API_TOKEN';
-const ALPHA_VANTAGE_KEY = 'YOUR_ALPHA_VANTAGE_API_KEY';
+const DHAN_CLIENT_ID = '1110885446';
+const DHAN_API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyUmVnaW9uIjoiUjEiLCJpc3MiOiJkaGFuIiwicGFydG5lcklkIjoiIiwiZXhwIjoxNzkwOTY1MjE0LCJpYXQiOjE3OTA4Nzg4MTQsInRva2VuQ29uc3VtZXJUeXBlIjoiU0VMRiIsIndlYmhvb2tVcmwiOiIiLCJkaGFuQ2xpZW50SWQiOiIxMTEwODg1NDQ2In0.Joduj0E6H90qZR3IVv5TWcPVJ3CySGWVAHVJu6wLcW5XftM1fHaPgnBhOg5vbc3gzh_CAca-OFyOBGK6wznlAA';
+const ALPHA_VANTAGE_KEY = '55ZITWU4955XXAGB';
 
 const ws = new VelaWorkspace('#chart', {
     layout: false, // SINGLE-CHART mode
