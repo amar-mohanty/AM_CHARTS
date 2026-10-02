@@ -24,13 +24,13 @@ const ws = new VelaWorkspace("#workspace", {
   // `cells` overrides per cell. A cell's NAME is its durable identity (persistence,
   // sync groups, ws.cell(name)) — DECLARATION ORDER fills the layout's slots, and
   // any entry is optional (an undeclared slot boots on the defaults above).
-  symbol: "BTCUSDT", // bare = first declared provider; 'coinbase:BTC-USD' pins a venue
-  timeframe: "60",
+  symbol: "yahoo:^NSEI", // Nifty 50 default
+  timeframe: "D",
   cells: {
-    btc: { symbol: "BTCUSDT", timeframe: "60" },
-    eth: { symbol: "ETHUSDT", timeframe: "15" },
-    sol: { symbol: "SOLUSDT", timeframe: "240" },
-    bnb: { symbol: "BNBUSDT", timeframe: "D" },
+    nifty: { symbol: "yahoo:^NSEI", timeframe: "D" },
+    reliance: { symbol: "yahoo:RELIANCE.NS", timeframe: "60" },
+    gold: { symbol: "yahoo:GC=F", timeframe: "D" },
+    spx: { symbol: "yahoo:^GSPC", timeframe: "D" },
   },
   providers: {
     binance: () => new BinanceProvider(),
