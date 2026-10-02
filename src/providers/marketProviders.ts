@@ -1,7 +1,14 @@
 import type { DataProvider, Bar } from '@luxalgo/vela';
 import axios from 'axios';
 
-// 1. DHAN PROVIDER (NSE Stocks & Derivatives)
+export interface SymbolSearchResult {
+  symbol: string;
+  name: string;
+  type: 'stock' | 'etf' | 'crypto' | 'futures' | 'forex' | 'commodity';
+  exchange?: string;
+}
+
+// 1. DHAN PROVIDER (NSE Stocks & Indices)
 export class DhanProvider implements DataProvider {
   private apiToken: string;
   private clientId: string;
@@ -11,16 +18,27 @@ export class DhanProvider implements DataProvider {
     this.apiToken = apiToken;
   }
 
+  // Tells Vela's Symbol Search modal about available Dhan symbols
+  async search(query: string): Promise<SymbolSearchResult[]> {
+    const list: SymbolSearchResult[] = [
+      { symbol: '13', name: 'NIFTY 50', type: 'stock', exchange: 'NSE' },
+      { symbol: '25', name: 'BANKNIFTY', type: 'stock', exchange: 'NSE' },
+      { symbol: '1333', name: 'RELIANCE', type: 'stock', exchange: 'NSE' },
+      { symbol: '11536', name: 'TCS', type: 'stock', exchange: 'NSE' },
+      { symbol: '1594', name: 'INFY', type: 'stock', exchange: 'NSE' },
+    ];
+    return list.filter(s => s.name.toLowerCase().includes(query.toLowerCase()) || s.symbol.includes(query));
+  }
+
   async getHistory(params: { symbol: string; timeframe: string; from: number; to: number }): Promise<Bar[]> {
     try {
-      // Determine exchange segment based on symbol format or default to NSE_EQ
-      const isIndex = params.symbol.toLowerCase().includes('nifty') || params.symbol.toLowerCase().includes('sensex');
+      const isIndex = params.symbol === '13' || params.symbol === '25';
       const exchangeSegment = isIndex ? 'INDEX_NSE' : 'NSE_EQ';
 
       const response = await axios.post(
         'https://api.dhan.co/v2/charts/historical',
         {
-          securityId: params.symbol, // Dhan Security ID
+          securityId: params.symbol,
           exchangeSegment: exchangeSegment,
           instrumentType: isIndex ? 'INDEX' : 'EQUITY',
           expiryCode: 0,
@@ -54,12 +72,39 @@ export class DhanProvider implements DataProvider {
   }
 }
 
-// 2. YAHOO FINANCE PROVIDER (Global Indices, NSE .NS tickers, Commodities)
+// 2. YAHOO FINANCE PROVIDER (NSE, Global Indices, Commodities, Forex)
 export class YahooFinanceProvider implements DataProvider {
+  private catalog: SymbolSearchResult[] = [
+    // Stocks & Indices
+    { symbol: '^NSEI', name: 'NIFTY 50 Index', type: 'stock', exchange: 'NSE' },
+    { symbol: '^BSESN', name: 'SENSEX Index', type: 'stock', exchange: 'BSE' },
+    { symbol: 'RELIANCE.NS', name: 'Reliance Industries', type: 'stock', exchange: 'NSE' },
+    { symbol: 'TCS.NS', name: 'Tata Consultancy Services', type: 'stock', exchange: 'NSE' },
+    { symbol: 'INFY.NS', name: 'Infosys', type: 'stock', exchange: 'NSE' },
+    { symbol: '^GSPC', name: 'S&P 500 Index', type: 'stock', exchange: 'US' },
+    { symbol: '^IXIC', name: 'NASDAQ Composite', type: 'stock', exchange: 'US' },
+    
+    // Commodities & Futures
+    { symbol: 'GC=F', name: 'Gold Futures', type: 'commodity', exchange: 'COMEX' },
+    { symbol: 'SI=F', name: 'Silver Futures', type: 'commodity', exchange: 'COMEX' },
+    { symbol: 'CL=F', name: 'Crude Oil Futures', type: 'commodity', exchange: 'NYMEX' },
+
+    // Forex
+    { symbol: 'USDINR=X', name: 'USD/INR', type: 'forex', exchange: 'FX' },
+    { symbol: 'EURUSD=X', name: 'EUR/USD', type: 'forex', exchange: 'FX' },
+  ];
+
+  async search(query: string): Promise<SymbolSearchResult[]> {
+    if (!query) return this.catalog;
+    const q = query.toLowerCase();
+    return this.catalog.filter(item => 
+      item.symbol.toLowerCase().includes(q) || item.name.toLowerCase().includes(q)
+    );
+  }
+
   async getHistory(params: { symbol: string; timeframe: string; from: number; to: number }): Promise<Bar[]> {
     try {
       const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${params.symbol}?period1=${params.from}&period2=${params.to}&interval=1d`;
-      // Route through CORS proxy to prevent browser blocks
       const url = `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`;
       
       const response = await axios.get(url);
@@ -85,12 +130,21 @@ export class YahooFinanceProvider implements DataProvider {
   }
 }
 
-// 3. ALPHA VANTAGE PROVIDER (US Stocks, Forex, Global Commodities)
+// 3. ALPHA VANTAGE PROVIDER
 export class AlphaVantageProvider implements DataProvider {
   private apiKey: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+  }
+
+  async search(query: string): Promise<SymbolSearchResult[]> {
+    const list: SymbolSearchResult[] = [
+      { symbol: 'AAPL', name: 'Apple Inc.', type: 'stock', exchange: 'NASDAQ' },
+      { symbol: 'MSFT', name: 'Microsoft Corp.', type: 'stock', exchange: 'NASDAQ' },
+      { symbol: 'IBM', name: 'IBM Corp.', type: 'stock', exchange: 'NYSE' },
+    ];
+    return list.filter(s => s.symbol.toLowerCase().includes(query.toLowerCase()));
   }
 
   async getHistory(params: { symbol: string; timeframe: string; from: number; to: number }): Promise<Bar[]> {
