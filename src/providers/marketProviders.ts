@@ -13,13 +13,16 @@ export class DhanProvider implements DataProvider {
 
   async getHistory(params: { symbol: string; timeframe: string; from: number; to: number }): Promise<Bar[]> {
     try {
-      // Dhan Historical Candles Endpoint
+      // Determine exchange segment based on symbol format or default to NSE_EQ
+      const isIndex = params.symbol.toLowerCase().includes('nifty') || params.symbol.toLowerCase().includes('sensex');
+      const exchangeSegment = isIndex ? 'INDEX_NSE' : 'NSE_EQ';
+
       const response = await axios.post(
         'https://api.dhan.co/v2/charts/historical',
         {
-          securityId: params.symbol, // e.g., Dhan Security ID (13 for Nifty 50, etc.)
-          exchangeSegment: 'NSE_EQ',
-          instrumentType: 'EQUITY',
+          securityId: params.symbol, // Dhan Security ID
+          exchangeSegment: exchangeSegment,
+          instrumentType: isIndex ? 'INDEX' : 'EQUITY',
           expiryCode: 0,
           fromDate: new Date(params.from * 1000).toISOString().split('T')[0],
           toDate: new Date(params.to * 1000).toISOString().split('T')[0],
@@ -36,14 +39,13 @@ export class DhanProvider implements DataProvider {
       const data = response.data;
       if (!data || !data.start_time) return [];
 
-      // Transform Dhan response array into Vela Bar structure
       return data.start_time.map((time: number, index: number) => ({
         time: time,
         open: data.open[index],
         high: data.high[index],
         low: data.low[index],
         close: data.close[index],
-        volume: data.volume[index],
+        volume: data.volume ? data.volume[index] : 0,
       }));
     } catch (err) {
       console.error('Dhan API Error:', err);
@@ -52,15 +54,19 @@ export class DhanProvider implements DataProvider {
   }
 }
 
-// 2. YAHOO FINANCE PROVIDER (Global Indices, NSE via .NS tickers, Commodities)
+// 2. YAHOO FINANCE PROVIDER (Global Indices, NSE .NS tickers, Commodities)
 export class YahooFinanceProvider implements DataProvider {
   async getHistory(params: { symbol: string; timeframe: string; from: number; to: number }): Promise<Bar[]> {
     try {
-      // Free public chart endpoint
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${params.symbol}?period1=${params.from}&period2=${params.to}&interval=1d`;
-      const response = await axios.get(url);
-      const result = response.data.chart.result[0];
+      const rawUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${params.symbol}?period1=${params.from}&period2=${params.to}&interval=1d`;
+      // Route through CORS proxy to prevent browser blocks
+      const url = `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`;
       
+      const response = await axios.get(url);
+      const result = response.data?.chart?.result?.[0];
+      
+      if (!result || !result.timestamp) return [];
+
       const timestamps = result.timestamp;
       const quotes = result.indicators.quote[0];
 
@@ -70,7 +76,7 @@ export class YahooFinanceProvider implements DataProvider {
         high: quotes.high[idx],
         low: quotes.low[idx],
         close: quotes.close[idx],
-        volume: quotes.volume[idx] || 0,
+        volume: quotes.volume ? quotes.volume[idx] : 0,
       }));
     } catch (err) {
       console.error('Yahoo Finance API Error:', err);
@@ -108,7 +114,6 @@ export class AlphaVantageProvider implements DataProvider {
         });
       }
 
-      // Sort chronological
       return bars.sort((a, b) => a.time - b.time);
     } catch (err) {
       console.error('Alpha Vantage API Error:', err);
