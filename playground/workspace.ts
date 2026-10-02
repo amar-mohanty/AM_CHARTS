@@ -32,7 +32,12 @@ const ws = new VelaWorkspace("#workspace", {
     sol: { symbol: "SOLUSDT", timeframe: "240" },
     bnb: { symbol: "BNBUSDT", timeframe: "D" },
   },
-  providers: { binance: () => new BinanceProvider() },
+  providers: {
+    binance: () => new BinanceProvider(),
+    dhan: () => new DhanProvider(DHAN_CLIENT_ID, DHAN_API_TOKEN),
+    yahoo: () => new YahooFinanceProvider(),
+    alphavantage: () => new AlphaVantageProvider(ALPHA_VANTAGE_KEY),
+  },
   engines: { demo: () => new DemoEngine() }, // ONE instance per cell (a worker engine would get a thread each)
   defaultLanguage: "demo", // scripts added without a `language` run on the engine above
   // No script manifest: the indicators dialog lists the built-in catalog only.
